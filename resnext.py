@@ -118,9 +118,7 @@ class ResNeXt(nn.Module):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
             elif isinstance(m, nn.Linear):
-#                init.kaiming_normal(m.weight, a=0, mode='fan_out')
-		init.normal(m.weight.data, std=0.001)
-#		m.weight.data.zero_()
+                init.normal(m.weight.data, std=0.001)
                 if hasattr(m.bias, 'data'):
                     m.bias.data.zero_()
 
