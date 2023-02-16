@@ -19,7 +19,7 @@ from collections import OrderedDict
 parser = argparse.ArgumentParser(description='Testing')
 parser.add_argument('--loss_type', default='soft', type=str)
 parser.add_argument('--name', default='resnet_50', type=str, help='output model name')
-parser.add_argument('--gpu_ids', default='1', type=str)
+parser.add_argument('--gpu_ids', default='0', type=str)
 parser.add_argument('--attack', default='I-FGSM', type=str, choices=['FGSM','I-FGSM','MI-FGSM'])
 parser.add_argument('--epsilon', default=5, type=int)
 parser.add_argument('--save_img', action='store_true')
@@ -40,7 +40,7 @@ def load_network(network):
 def fliplr(img):
     '''flip horizontal'''
     inv_idx = torch.arange(img.size(3) - 1, -1, -1).long()  # N x C x H x W
-    inv_idx = Variable(inv_idx.cuda(async=True))
+    inv_idx = Variable(inv_idx.cuda(non_blocking=True))
     img_flip = img.index_select(3, inv_idx)
     return img_flip
 
@@ -95,7 +95,7 @@ def extract_features_gid(model, gid):
 
     for g_data in gallery_dataloader:
         g_img = g_data
-        g_img = Variable(g_img.data.cuda(async=True))
+        g_img = Variable(g_img.data.cuda(non_blocking=True))
         # g_img = Variable(g_img.cuda())
         g_feature = extract_feature_img(model, g_img)
 
@@ -114,10 +114,10 @@ def FGSM(model, gid, epsilon = 10):
 
     for q_data in query_dataloader:
         q_img = q_data
-        q_img = Variable(q_img.data.cuda(async=True))
+        q_img = Variable(q_img.data.cuda(non_blocking=True))
         for g_data in gallery_dataloader:
             g_img = g_data
-            x_adv = Variable(g_img.data.cuda(async=True))
+            x_adv = Variable(g_img.data.cuda(non_blocking=True))
             x_adv.requires_grad = True
             # assert q_label[0] == g_label[0]
             q_feature = extract_feature_img(model, q_img)
@@ -151,12 +151,12 @@ def MI_FGSM(model, gid, epsilon=10.0, alpha=1.0, momentum=0.0):
 
     for q_data in query_dataloader:
         q_img = q_data
-        q_img = Variable(q_img.data.cuda(async=True))
+        q_img = Variable(q_img.data.cuda(non_blocking=True))
         q_feature = extract_feature_img(model, q_img)
         q_feature.detach_()
         for g_data in gallery_dataloader:
             g_img = g_data
-            x_adv = Variable(g_img.data.cuda(async=True))
+            x_adv = Variable(g_img.data.cuda(non_blocking=True))
             lower_bound = g_img.data.cuda() - epsilon / 255.0
             lower_bound[lower_bound < 0.0] = 0.0
             upper_bound = g_img.data.cuda() + epsilon / 255.0
