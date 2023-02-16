@@ -18,9 +18,9 @@ def weights_init_kaiming(m):
     elif classname.find('BatchNorm1d') != -1:
         init.normal(m.weight.data, 1.0, 0.02)
     else:
-	pass
+	      pass
     if hasattr(m.bias, 'data'):
-	init.constant(m.bias.data, 0.0)
+	      init.constant(m.bias.data, 0.0)
 
 def weights_init_classifier(m):
     classname = m.__class__.__name__
@@ -50,13 +50,13 @@ class ft_net(nn.Module):
 
         self.fc0 = nn.Linear(num_bottleneck, class_num, bias = True)
         init.normal(self.fc0.weight.data, std=0.001)
-    	if hasattr(self.fc0.bias, 'data'):
-	    init.constant(self.fc0.bias.data, 0.0)
+        if hasattr(self.fc0.bias, 'data'):
+            init.constant(self.fc0.bias.data, 0.0)
 
     def forward(self, x, if_train = True):
         x = self.model(x)
         if if_train == False:
-	    return x
+	          return x
         x = self.fc0(x)
         return x
 
@@ -82,14 +82,14 @@ class ft_net_dense(nn.Module):
         self.fc0 = nn.Linear(num_bottleneck, class_num, bias = True)
         init.normal(self.fc0.weight.data, std=0.001)
         if hasattr(self.fc0.bias, 'data'):
-		init.constant(self.fc0.bias.data, 0.0)
+          init.constant(self.fc0.bias.data, 0.0)
 
     def forward(self, x, is_train=True):
         x = self.model.features(x)
         x = x.view(x.size(0), -1)
         x = self.model.bn(x)
         if is_train == False:
-            return x
+          return x
         x = self.fc0(x)
         return x
 
